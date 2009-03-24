@@ -1,0 +1,131 @@
+s#=============================================================================
+# OUTPUT_TYPE can be one of the following :
+#   - 'STATIC_LIB' for a static library (.a)
+#   - 'DYNAMIC_LIB' for a dynamic library (.so)
+#   - 'DEVICE' for a device server (will automatically include and link
+#            with Tango dependencies)
+#   - 'SIMPLE_EXE' for an executable with no dependency (for exemple the test tool
+#                of a library with no Tango dependencies)
+#
+OUTPUT_TYPE = STATIC_LIB
+
+
+
+
+#=============================================================================
+# PACKAGE_NAME is the name of the library/device/exe you want to build
+#   - for a device server, PACKAGE_NAME will be prefixed by 'ds_'
+#   - for a library (static or dynamic), PACKAGE_NAME will be prefixed by 'lib'
+#   - for a simple executable, PACKAGE_NAME will be the name of the executable
+#
+PACKAGE_NAME = ISL
+
+
+
+
+
+#=============================================================================
+# INC_DIR_USER is the list of all include path needed by your sources
+#   - for a device server, tango dependencies are automatically appended
+#   - '-I ../include' and '-I .' are automatically appended in all cases
+#
+INC_DIR_USER=	-I $(SOLEIL_ROOT)/sw-support/OpenCV/include
+
+
+
+#=============================================================================
+# LIB_DIR_USER is the list of user library directories
+#   - for a device server, tango libraries directories are automatically appended
+#   - '-L ../lib' is automatically appended in all cases
+#
+
+LIB_DIR_USER=
+
+
+
+#=============================================================================
+# LFLAGS_USR is the list of user link flags
+#   - for a device server, tango libraries directories are automatically appended
+#   - '-ldl -lpthread' is automatically appended in all cases
+#
+# !!! ATTENTION !!!
+# Be aware that the order matters. 
+# For example if you must link with libA, and if libA depends itself on libB
+# you must use '-lA -lB' in this order as link flags, otherwise you will get
+# 'undefined reference' errors
+#
+LFLAGS_USR=
+
+
+
+
+#=============================================================================
+# CXXFLAGS_USR lists the compilation flags specific for your library/device/exe
+# This is the place where to put your compile-time macros using '-Dmy_macro'
+#
+CXXFLAGS_USR=
+
+
+
+#
+#	include Standard TANGO compilation options
+#
+include $(SOLEIL_ROOT)/env/tango.opt
+
+
+
+#=============================================================================
+# SVC_OBJS is the list of all objects needed to make the output
+#
+SVC_OBJS = $(OBJDIR)/Image.o \
+           $(OBJDIR)/ErrorHandler.o \
+           $(OBJDIR)/Exception.o  \
+           $(OBJDIR)/InternalErrorHandler.o  \
+           $(OBJDIR)/AutoROI.o  \
+           $(OBJDIR)/BeamBox.o  \
+           $(OBJDIR)/blob/Blob.o  \
+           $(OBJDIR)/blob/BlobComparator.o  \
+           $(OBJDIR)/blob/BlobList.o  \
+           $(OBJDIR)/blob/BlobMeasure.o  \
+           $(OBJDIR)/blob/Criteria.o  \
+           $(OBJDIR)/blob/Filter.o  \
+           $(OBJDIR)/calib/Calib.o  \
+           $(OBJDIR)/calib/Engine.o  \
+           $(OBJDIR)/calib/PatternAnalyzer.o  \
+           $(OBJDIR)/calib/PerspEngine.o  \
+           $(OBJDIR)/calib/TsaiEngine.o  \
+           $(OBJDIR)/geometry/Ellipse.o  \
+           $(OBJDIR)/geometry/Rectangle.o  \
+           $(OBJDIR)/statistics/AccurateCentroid.o  \
+           $(OBJDIR)/statistics/GaussianFit1D.o  \
+           $(OBJDIR)/statistics/GaussianFit2D.o  \
+           $(OBJDIR)/statistics/Histogram.o  \
+           $(OBJDIR)/statistics/LineProfile.o \
+           $(OBJDIR)/statistics/LMOptim.o  \
+           $(OBJDIR)/statistics/Moments.o  \
+           $(OBJDIR)/statistics/PrincipalAxis.o  \
+           $(OBJDIR)/statistics/Projections.o \
+           $(OBJDIR)/statistics/NoiseEstimator.o \
+           $(OBJDIR)/movie/MovieWriter.o \
+           $(OBJDIR)/movie/MovieWriter_GraphicFile.o \
+           $(OBJDIR)/movie/MovieWriter_MPEG.o
+
+
+
+EXTERNAL_LIBS = $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cx.a \
+		$(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cv.a \
+		$(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_highgui.a \
+		$(SOLEIL_ROOT)/sw-support/GraphicFiles/libjpeg/lib/libjpeg.a \
+		$(SOLEIL_ROOT)/sw-support/GraphicFiles/libtiff/lib/libtiff.a \
+		$(SOLEIL_ROOT)/sw-support/GraphicFiles/libpng/lib/libpng.a \
+		$(SOLEIL_ROOT)/sw-support/Zlib/lib/libz.a
+
+#
+# Verbose mode
+#
+.SILENT:
+
+#
+#	include common targets
+#
+include $(SOLEIL_ROOT)/env/common_target.opt

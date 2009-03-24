@@ -1,0 +1,88 @@
+#
+device_server= ISL
+#
+
+#OUTPUT_DIR=../lib/static/msvc-8.0
+
+#  LEs PATHS des includes propres à ce DServer
+#  Mettre /Ic:\monchemininclude /ID:\monautrechemininclude
+INCUSER=/I $(SOLEIL_ROOT)\sw-support\OpenCV\include
+#
+#  Le chemin complet de vos Librairies
+#
+# LIBUSER = "x:\moncheminlibrairie\malibrairie.lib"
+#LIBUSER= $(SOLEIL_ROOT)\sw-support\OpenCV\lib\shared\msvc-8.0\cxcore.lib \
+#		 $(SOLEIL_ROOT)\sw-support\OpenCV\lib\shared\msvc-8.0\cv.lib \
+#		 $(SOLEIL_ROOT)\sw-support\OpenCV\lib\shared\msvc-8.0\highgui.lib
+
+#	 Si vous souhaitez générer une librairie et pas un executable
+#	 decommentez la ligne suivante
+!ifdef DEBUG
+LIBRARY_NAME= ..\lib\static\msvc-8.0\libISLd.lib
+!else
+LIBRARY_NAME= ..\lib\static\msvc-8.0\libISL.lib
+!endif
+
+
+CPPDIRUSER=.\blob
+CPPDIRUSER1=.\calib
+CPPDIRUSER2=.\geometry
+CPPDIRUSER3=.\statistics
+CPPDIRUSER4=.\movie
+
+
+#
+# ------------------Fin des modifications pour le end user -------------------------------------
+#
+make_dir=$(SOLEIL_ROOT)\env
+
+#  Les définitions communes à tous les DeviceServeurs
+!include $(make_dir)\tango.opt
+
+exe_device_server=dummy
+
+# --------------------------------------
+#   Partie spécifique Device Server
+# --------------------------------------
+
+LISTEOBJ= $(OBJDIR)\Image.obj \
+          $(OBJDIR)\ErrorHandler.obj \
+          $(OBJDIR)\Exception.obj  \
+          $(OBJDIR)\InternalErrorHandler.obj  \
+          $(OBJDIR)\BeamBox.obj  \
+          $(OBJDIR)\AutoROI.obj  \
+          $(OBJDIR)\Blob.obj  \
+          $(OBJDIR)\BlobComparator.obj  \
+          $(OBJDIR)\BlobList.obj  \
+          $(OBJDIR)\BlobMeasure.obj  \
+          $(OBJDIR)\Criteria.obj  \
+          $(OBJDIR)\Filter.obj  \
+          $(OBJDIR)\Calib.obj  \
+          $(OBJDIR)\Engine.obj  \
+          $(OBJDIR)\PatternAnalyzer.obj  \
+          $(OBJDIR)\PerspEngine.obj  \
+          $(OBJDIR)\TsaiEngine.obj  \
+          $(OBJDIR)\Ellipse.obj  \
+          $(OBJDIR)\Rectangle.obj  \
+          $(OBJDIR)\AccurateCentroid.obj  \
+          $(OBJDIR)\GaussianFit1D.obj  \
+          $(OBJDIR)\GaussianFit2D.obj  \
+          $(OBJDIR)\Histogram.obj  \
+          $(OBJDIR)\LMOptim.obj  \
+          $(OBJDIR)\Moments.obj  \
+          $(OBJDIR)\PrincipalAxis.obj  \
+          $(OBJDIR)\Projections.obj \
+          $(OBJDIR)\LineProfile.obj \
+          $(OBJDIR)\NoiseEstimator.obj \
+          $(OBJDIR)\MovieWriter.obj \
+          $(OBJDIR)\MovieWriter_GraphicFile.obj \
+          $(OBJDIR)\MovieWriter_GraphicFileASCII.obj \
+          $(OBJDIR)\MovieWriter_GraphicFileISL.obj \
+          $(OBJDIR)\MovieWriter_GraphicFileRAS.obj \
+          $(OBJDIR)\MovieWriter_FFmpeg.obj \
+          $(OBJDIR)\MovieWriterFactory.obj
+
+
+
+# --------------------------------------
+!include $(make_dir)\common_target.opt
