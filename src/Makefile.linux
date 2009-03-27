@@ -1,15 +1,18 @@
-s#=============================================================================
-# OUTPUT_TYPE can be one of the following :
+
+OPENCV_ROOT ?= $(SOLEIL_ROOT)/sw-support/OpenCV
+
+RELEASE_TYPE=OPTIMIZED
+
+#=============================================================================
+# PROJECT_TYPE can be one of the following :
 #   - 'STATIC_LIB' for a static library (.a)
-#   - 'DYNAMIC_LIB' for a dynamic library (.so)
+#   - 'SHARED_LIB' for a dynamic library (.so)
 #   - 'DEVICE' for a device server (will automatically include and link
 #            with Tango dependencies)
 #   - 'SIMPLE_EXE' for an executable with no dependency (for exemple the test tool
 #                of a library with no Tango dependencies)
 #
-OUTPUT_TYPE = STATIC_LIB
-
-
+PROJECT_TYPE = STATIC_LIB
 
 
 #=============================================================================
@@ -18,10 +21,11 @@ OUTPUT_TYPE = STATIC_LIB
 #   - for a library (static or dynamic), PACKAGE_NAME will be prefixed by 'lib'
 #   - for a simple executable, PACKAGE_NAME will be the name of the executable
 #
-PACKAGE_NAME = ISL
-
-
-
+ifeq ($(RELEASE_TYPE),OPTIMIZED)
+  PROJECT_NAME = ISL
+else
+  PROJECT_NAME = ISLd
+endif
 
 
 #=============================================================================
@@ -29,8 +33,7 @@ PACKAGE_NAME = ISL
 #   - for a device server, tango dependencies are automatically appended
 #   - '-I ../include' and '-I .' are automatically appended in all cases
 #
-INC_DIR_USER=	-I $(SOLEIL_ROOT)/sw-support/OpenCV/include
-
+INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv
 
 
 #=============================================================================
@@ -38,7 +41,6 @@ INC_DIR_USER=	-I $(SOLEIL_ROOT)/sw-support/OpenCV/include
 #   - for a device server, tango libraries directories are automatically appended
 #   - '-L ../lib' is automatically appended in all cases
 #
-
 LIB_DIR_USER=
 
 
@@ -57,14 +59,11 @@ LIB_DIR_USER=
 LFLAGS_USR=
 
 
-
-
 #=============================================================================
 # CXXFLAGS_USR lists the compilation flags specific for your library/device/exe
 # This is the place where to put your compile-time macros using '-Dmy_macro'
 #
 CXXFLAGS_USR=
-
 
 
 #
@@ -108,17 +107,23 @@ SVC_OBJS = $(OBJDIR)/Image.o \
            $(OBJDIR)/statistics/NoiseEstimator.o \
            $(OBJDIR)/movie/MovieWriter.o \
            $(OBJDIR)/movie/MovieWriter_GraphicFile.o \
-           $(OBJDIR)/movie/MovieWriter_MPEG.o
+           $(OBJDIR)/movie/MovieWriter_FFmpeg.o \
+           $(OBJDIR)/movie/MovieWriterFactory.o \
+           $(OBJDIR)/movie/MovieWriter_GraphicFileASCII.o \
+           $(OBJDIR)/movie/MovieWriter_GraphicFileISL.o
 
+ifeq ($(OUTPUT_TYPE),STATIC_LIB)
+  EXTERNAL_LIBS = $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cx.a \
+                  $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cv.a \
+                  $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_highgui.a \
+                  $(SOLEIL_ROOT)/sw-support/GraphicFiles/libjpeg/lib/libjpeg.a \
+                  $(SOLEIL_ROOT)/sw-support/GraphicFiles/libtiff/lib/libtiff.a \
+                  $(SOLEIL_ROOT)/sw-support/GraphicFiles/libpng/lib/libpng.a \
+                  $(SOLEIL_ROOT)/sw-support/Zlib/lib/libz.a
+else
+  EXTERNAL_LIBS =
+endif
 
-
-EXTERNAL_LIBS = $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cx.a \
-		$(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cv.a \
-		$(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_highgui.a \
-		$(SOLEIL_ROOT)/sw-support/GraphicFiles/libjpeg/lib/libjpeg.a \
-		$(SOLEIL_ROOT)/sw-support/GraphicFiles/libtiff/lib/libtiff.a \
-		$(SOLEIL_ROOT)/sw-support/GraphicFiles/libpng/lib/libpng.a \
-		$(SOLEIL_ROOT)/sw-support/Zlib/lib/libz.a
 
 #
 # Verbose mode
@@ -129,3 +134,17 @@ EXTERNAL_LIBS = $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cx.a \
 #	include common targets
 #
 include $(SOLEIL_ROOT)/env/common_target.opt
+
+MAKEIT = $(MAKE) -f Makefile.linux
+
+debug-shared:
+	$(MAKEIT) RELEASE_TYPE=DEBUG OUTPUT_TYPE=SHARED_LIB
+
+debug-static:
+	$(MAKEIT) RELEASE_TYPE=DEBUG OUTPUT_TYPE=STATIC_LIB
+
+release-shared:
+	$(MAKEIT) RELEASE_TYPE=OPTIMIZED OUTPUT_TYPE=SHARED_LIB
+
+release-static:
+	$(MAKEIT) RELEASE_TYPE=OPTIMIZED OUTPUT_TYPE=STATIC_LIB
