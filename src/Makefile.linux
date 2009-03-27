@@ -27,13 +27,12 @@ else
   PROJECT_NAME = ISLd
 endif
 
-
 #=============================================================================
 # INC_DIR_USER is the list of all include path needed by your sources
 #   - for a device server, tango dependencies are automatically appended
 #   - '-I ../include' and '-I .' are automatically appended in all cases
 #
-INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv
+INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv -I $(OPENCV_ROOT)/include
 
 
 #=============================================================================
@@ -105,14 +104,13 @@ SVC_OBJS = $(OBJDIR)/Image.o \
            $(OBJDIR)/statistics/PrincipalAxis.o  \
            $(OBJDIR)/statistics/Projections.o \
            $(OBJDIR)/statistics/NoiseEstimator.o \
+           $(OBJDIR)/movie/MovieWriterFactory.o \
            $(OBJDIR)/movie/MovieWriter.o \
            $(OBJDIR)/movie/MovieWriter_GraphicFile.o \
-           $(OBJDIR)/movie/MovieWriter_FFmpeg.o \
-           $(OBJDIR)/movie/MovieWriterFactory.o \
            $(OBJDIR)/movie/MovieWriter_GraphicFileASCII.o \
            $(OBJDIR)/movie/MovieWriter_GraphicFileISL.o
 
-ifeq ($(OUTPUT_TYPE),STATIC_LIB)
+ifeq ($(PROJECT_TYPE),STATIC_LIB)
   EXTERNAL_LIBS = $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cx.a \
                   $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cv.a \
                   $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_highgui.a \
@@ -134,6 +132,21 @@ endif
 #	include common targets
 #
 include $(SOLEIL_ROOT)/env/common_target.opt
+
+
+
+releases:
+	make -f Makefile.linux clean all RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=STATIC_LIB
+	make -f Makefile.linux clean all RELEASE_TYPE=DEBUG PROJECT_TYPE=STATIC_LIB
+
+distrib:
+	cd ../include/isl; cp *.h *.i $(SOLEIL_ROOT)/sw-support/ISL/include/isl
+	cd ../include/isl/blob; cp *.h *.i $(SOLEIL_ROOT)/sw-support/ISL/include/isl/blob
+	cd ../include/isl/calib; cp *.h $(SOLEIL_ROOT)/sw-support/ISL/include/isl/calib
+	cd ../include/isl/geometry; cp *.h *.i *.t $(SOLEIL_ROOT)/sw-support/ISL/include/isl/geometry
+	cd ../include/isl/movie; cp *.h $(SOLEIL_ROOT)/sw-support/ISL/include/isl/movie
+	cd ../include/isl/statistics; cp *.h *.i $(SOLEIL_ROOT)/sw-support/ISL/include/isl/statistics
+	cd ../lib; cp *.a $(SOLEIL_ROOT)/sw-support/ISL/lib
 
 MAKEIT = $(MAKE) -f Makefile.linux
 
