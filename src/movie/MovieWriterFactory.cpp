@@ -26,11 +26,13 @@ namespace isl
     config.frame_rate    = _config.frame_rate;
 
 
+    /*
     if (config.format == "mpg"
         || config.format == "avi")
     {
       mvw = new MovieWriter_FFmpeg(config);
     }
+    */
 
     if ((config.format == "jpg")
          || (config.format == "png")
