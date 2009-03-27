@@ -32,7 +32,7 @@ endif
 #   - for a device server, tango dependencies are automatically appended
 #   - '-I ../include' and '-I .' are automatically appended in all cases
 #
-INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv -I $(OPENCV_ROOT)/include
+INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv
 
 
 #=============================================================================
@@ -40,8 +40,11 @@ INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv -I $(OPENCV_ROOT)/include
 #   - for a device server, tango libraries directories are automatically appended
 #   - '-L ../lib' is automatically appended in all cases
 #
-LIB_DIR_USER=
-
+ifeq ($(PROJECT_TYPE),STATIC_LIB)
+	LIB_DIR_USER=
+else
+	LIB_DIR_USER=-L$(OPENCV_ROOT)/lib
+endif
 
 
 #=============================================================================
@@ -55,7 +58,12 @@ LIB_DIR_USER=
 # you must use '-lA -lB' in this order as link flags, otherwise you will get
 # 'undefined reference' errors
 #
-LFLAGS_USR=
+
+ifeq ($(PROJECT_TYPE),STATIC_LIB)
+	LFLAGS_USR=
+else
+	LFLAGS_USR=-lcv -lcxcore -lhighgui
+endif
 
 
 #=============================================================================
@@ -110,23 +118,10 @@ SVC_OBJS = $(OBJDIR)/Image.o \
            $(OBJDIR)/movie/MovieWriter_GraphicFileASCII.o \
            $(OBJDIR)/movie/MovieWriter_GraphicFileISL.o
 
-ifeq ($(PROJECT_TYPE),STATIC_LIB)
-  EXTERNAL_LIBS = $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cx.a \
-                  $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_cv.a \
-                  $(SOLEIL_ROOT)/sw-support/OpenCV/lib/libOpenCV_highgui.a \
-                  $(SOLEIL_ROOT)/sw-support/GraphicFiles/libjpeg/lib/libjpeg.a \
-                  $(SOLEIL_ROOT)/sw-support/GraphicFiles/libtiff/lib/libtiff.a \
-                  $(SOLEIL_ROOT)/sw-support/GraphicFiles/libpng/lib/libpng.a \
-                  $(SOLEIL_ROOT)/sw-support/Zlib/lib/libz.a
-else
-  EXTERNAL_LIBS =
-endif
-
-
 #
 # Verbose mode
 #
-.SILENT:
+#.SILENT:
 
 #
 #	include common targets
@@ -135,29 +130,32 @@ include $(SOLEIL_ROOT)/env/common_target.opt
 
 
 
-releases:
-	make -f Makefile.linux clean all RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=STATIC_LIB
-	make -f Makefile.linux clean all RELEASE_TYPE=DEBUG PROJECT_TYPE=STATIC_LIB
+MAKEIT = $(MAKE) -f Makefile.linux
 
-distrib:
+debug-shared:
+	$(MAKEIT) RELEASE_TYPE=DEBUG PROJECT_TYPE=SHARED_LIB
+
+debug-static:
+	$(MAKEIT) RELEASE_TYPE=DEBUG PROJECT_TYPE=STATIC_LIB
+
+release-shared:
+	$(MAKEIT) RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=SHARED_LIB
+
+release-static:
+	$(MAKEIT) RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=STATIC_LIB
+
+
+releases:
+	$(MAKEIT) RELEASE_TYPE=DEBUG PROJECT_TYPE=SHARED_LIB clean all
+	$(MAKEIT) RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=SHARED_LIB clean all
+	$(MAKEIT) RELEASE_TYPE=DEBUG PROJECT_TYPE=STATIC_LIB clean all
+	$(MAKEIT) RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=STATIC_LIB clean all
+
+distrib: releases
 	cd ../include/isl; cp *.h *.i $(SOLEIL_ROOT)/sw-support/ISL/include/isl
 	cd ../include/isl/blob; cp *.h *.i $(SOLEIL_ROOT)/sw-support/ISL/include/isl/blob
 	cd ../include/isl/calib; cp *.h $(SOLEIL_ROOT)/sw-support/ISL/include/isl/calib
 	cd ../include/isl/geometry; cp *.h *.i *.t $(SOLEIL_ROOT)/sw-support/ISL/include/isl/geometry
 	cd ../include/isl/movie; cp *.h $(SOLEIL_ROOT)/sw-support/ISL/include/isl/movie
 	cd ../include/isl/statistics; cp *.h *.i $(SOLEIL_ROOT)/sw-support/ISL/include/isl/statistics
-	cd ../lib; cp *.a $(SOLEIL_ROOT)/sw-support/ISL/lib
-
-MAKEIT = $(MAKE) -f Makefile.linux
-
-debug-shared:
-	$(MAKEIT) RELEASE_TYPE=DEBUG OUTPUT_TYPE=SHARED_LIB
-
-debug-static:
-	$(MAKEIT) RELEASE_TYPE=DEBUG OUTPUT_TYPE=STATIC_LIB
-
-release-shared:
-	$(MAKEIT) RELEASE_TYPE=OPTIMIZED OUTPUT_TYPE=SHARED_LIB
-
-release-static:
-	$(MAKEIT) RELEASE_TYPE=OPTIMIZED OUTPUT_TYPE=STATIC_LIB
+	cd ../lib; cp *.a $(SOLEIL_ROOT)/sw-support/ISL/lib/static; cp *.so $(SOLEIL_ROOT)/sw-support/ISL/lib/shared
