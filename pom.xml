@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fr.soleil</groupId>
+        <artifactId>super-pom-C-CPP-tango</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>fr.soleil.lib</groupId>
+    <artifactId>ISL</artifactId>
+    <version>2.6.2</version>
+
+    <packaging>nar</packaging>
+
+    <name>ISL</name>
+    <description>ISL library</description>
+
+
+    <scm>
+        <connection>
+			${scm.connection.cvs.soleil}:Libraries/ISL
+        </connection>
+        <url>
+			${scm.url.cvs.soleil}/Libraries/ISL
+        </url>
+    </scm>
+
+	<!--
+	 You can override these properties from the command line
+	 ex : mvn install -Dlibrary=static
+	  -->
+    <properties>
+        <library>static</library> <!-- define the type of library by default  -->
+		<!-- <DEBUG>true</DEBUG>  uncomment if you build in debug by default  -->
+    </properties>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.freehep</groupId>
+                <artifactId>freehep-nar-plugin</artifactId>
+
+                <configuration>
+                    <cpp>
+                        <sourceDirectory>src</sourceDirectory>
+                        <includePaths>
+                            <includePath>${basedir}/include</includePath>
+                            <includePath>${basedir}/src</includePath>
+                        </includePaths>
+                    </cpp>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.sourceforge</groupId>
+            <artifactId>OpenCV</artifactId>
+            <version>1.0.0</version>
+                    <!--classifier>${aol}-static</classifier>
+                    <type>nar</type-->
+        </dependency>
+    </dependencies>
+</project>
