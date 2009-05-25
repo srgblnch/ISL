@@ -6,7 +6,7 @@
     <parent>
         <groupId>fr.soleil</groupId>
         <artifactId>super-pom-C-CPP-tango</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>RELEASE</version>
     </parent>
 
     <groupId>fr.soleil.lib</groupId>
@@ -27,16 +27,6 @@
 			${scm.url.cvs.soleil}/Libraries/ISL
         </url>
     </scm>
-
-	<!--
-	 You can override these properties from the command line
-	 ex : mvn install -Dlibrary=static
-	  -->
-    <properties>
-        <library>static</library> <!-- define the type of library by default  -->
-		<!-- <DEBUG>true</DEBUG>  uncomment if you build in debug by default  -->
-    </properties>
-
 
     <build>
         <plugins>
@@ -60,10 +50,15 @@
     <dependencies>
         <dependency>
             <groupId>net.sourceforge</groupId>
-            <artifactId>OpenCV</artifactId>
-            <version>1.0.0</version>
-                    <!--classifier>${aol}-static</classifier>
-                    <type>nar</type-->
+            <artifactId>cv-${aol}-${library}-${mode}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge</groupId>
+            <artifactId>cxcore-${aol}-${library}-${mode}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge</groupId>
+            <artifactId>highgui-${aol}-${library}-${mode}</artifactId>
         </dependency>
     </dependencies>
 </project>
