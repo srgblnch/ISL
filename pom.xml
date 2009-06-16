@@ -48,17 +48,9 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>cv-${aol}-${library}-${mode}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>cxcore-${aol}-${library}-${mode}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>highgui-${aol}-${library}-${mode}</artifactId>
-        </dependency>
+            <dependency>
+                <groupId>net.sourceforge</groupId>
+                <artifactId>OpenCV</artifactId>
+            </dependency>
     </dependencies>
 </project>
