@@ -1,56 +1,79 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>fr.soleil</groupId>
-        <artifactId>super-pom-C-CPP-tango</artifactId>
-        <version>RELEASE</version>
-    </parent>
-
-    <groupId>fr.soleil.lib</groupId>
-    <artifactId>ISL-${aol}-${library}-${mode}</artifactId>
-    <version>2.6.2</version>
-
-    <packaging>nar</packaging>
-
-    <name>ISL</name>
-    <description>ISL library</description>
-
-
-    <scm>
-        <connection>
-			${scm.connection.cvs.soleil}:Libraries/ISL
-        </connection>
-        <url>
-			${scm.url.cvs.soleil}/Libraries/ISL
-        </url>
-    </scm>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.freehep</groupId>
-                <artifactId>freehep-nar-plugin</artifactId>
-
-                <configuration>
-                    <cpp>
-                        <sourceDirectory>src</sourceDirectory>
-                        <includePaths>
-                            <includePath>${basedir}/include</includePath>
-                            <includePath>${basedir}/src</includePath>
-                        </includePaths>
-                    </cpp>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <dependencies>
-            <dependency>
-                <groupId>net.sourceforge</groupId>
-                <artifactId>OpenCV</artifactId>
-            </dependency>
-    </dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>
+    4.0.0
+  </modelVersion>
+  <parent>
+    <groupId>
+      fr.soleil
+    </groupId>
+    <artifactId>
+      super-pom-C-CPP-tango
+    </artifactId>
+    <version>
+      RELEASE
+    </version>
+  </parent>
+  <groupId>
+    fr.soleil.lib
+  </groupId>
+  <artifactId>
+    ISL-${aol}-${library}-${mode}
+  </artifactId>
+  <version>
+    2.6.1
+  </version>
+  <packaging>
+    nar
+  </packaging>
+  <name>
+    ISL
+  </name>
+  <description>
+    ISL library
+  </description>
+  <scm>
+    <connection>
+      ${scm.connection.cvs.soleil}:Libraries/ISL
+    </connection>
+    <url>
+      ${scm.url.cvs.soleil}/Libraries/ISL
+    </url>
+  </scm>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>
+          org.freehep
+        </groupId>
+        <artifactId>
+          freehep-nar-plugin
+        </artifactId>
+        <configuration>
+          <cpp>
+            <sourceDirectory>
+              src
+            </sourceDirectory>
+            <includePaths>
+              <includePath>
+                ${basedir}/include
+              </includePath>
+              <includePath>
+                ${basedir}/src
+              </includePath>
+            </includePaths>
+          </cpp>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>
+        net.sourceforge
+      </groupId>
+      <artifactId>
+        OpenCV
+      </artifactId>
+    </dependency>
+  </dependencies>
 </project>
