@@ -13,8 +13,9 @@
    <name>ISL</name>
    <description>ISL library</description>
    <scm>
-       <connection>${scm.connection.cvs.soleil}:Libraries/ISL</connection>
-       <url>${scm.url.cvs.soleil}/Libraries/ISL</url>
+       <connection>${scm.connection.cvs.tango-ds}:Libraries/ISL</connection>
+       <developerConnection>${scm.developerConnection.cvs.tango-ds}:Libraries/ISL</developerConnection>
+       <url>${scm.url.cvs.tango-ds}/Libraries/ISL</url>
    </scm>
    <build>
        <plugins>
