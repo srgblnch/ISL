@@ -37,7 +37,7 @@
    <dependencies>
        <dependency>
            <groupId>net.sourceforge</groupId>
-           <artifactId>OpenCV</artifactId>
+           <artifactId>OpenCV-${aol}-shared-release</artifactId>
        </dependency>
    </dependencies>
 </project>
