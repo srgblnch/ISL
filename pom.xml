@@ -8,7 +8,7 @@
    </parent>
    <groupId>fr.soleil.lib</groupId>
    <artifactId>ISL-${aol}-${library}-${mode}</artifactId>
-   <version>2.6.1</version>
+   <version>2.6.2</version>
    <packaging>nar</packaging>
    <name>ISL</name>
    <description>ISL library</description>
