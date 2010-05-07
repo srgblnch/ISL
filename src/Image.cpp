@@ -570,7 +570,11 @@ Image::get_roi(int& actual_origin_x, int& actual_origin_y, int& actual_width, in
   CV_CALL( cvGetSubRect(this->cv_image_, &submat, rect) );
   
   //- clone the data and store them in a Image class
+#if CV_MAJOR_VERSION >= 2
+  ISL_CALL( roi_image = new Image(submat.width, submat.height, cvIplDepth(submat.type)) );
+#else
   ISL_CALL( roi_image = new Image(submat.width, submat.height, cvCvToIplDepth(submat.type)) );
+#endif
   CV_CALL( cvCopy(&submat, roi_image->cv_image_, NULL) );
 
   //- the ROI has been selected successfully, update the output values
