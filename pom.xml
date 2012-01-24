@@ -8,7 +8,7 @@
    </parent>
    <groupId>fr.soleil.lib</groupId>
    <artifactId>ISL-${aol}-${library}-${mode}</artifactId>
-   <version>2.6.3</version>
+   <version>2.6.5</version>
    <packaging>nar</packaging>
    <name>ISL</name>
    <description>ISL library</description>
@@ -17,6 +17,19 @@
        <developerConnection>${scm.developerConnection.cvs.tango-ds}:Libraries/ISL</developerConnection>
        <url>${scm.url.cvs.tango-ds}/Libraries/ISL</url>
    </scm>
+   <developers>
+    <developer>
+      <id>leclercq</id>
+      <name>Nicolas Leclercq</name>
+      <email>nicolas.leclercq@synchrotron-soleil.fr</email>
+      <organization>Synchrotron Soleil</organization>
+      <organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl> 
+      <roles>
+        <role>manager</role>
+      </roles>
+      <timezone>1</timezone>
+    </developer>
+   </developers> 
    <build>
        <plugins>
            <plugin>
