@@ -93,11 +93,12 @@ namespace isl {
  *  \brief The different storage type of elements of an image
  *  @{
  */
-const int ISL_STORAGE_CHAR      = IPL_DEPTH_8S; ///< signed 8-bit integers
-const int ISL_STORAGE_UCHAR     = IPL_DEPTH_8U; ///< unsigned 8-bit integers
-const int ISL_STORAGE_SHORT     = IPL_DEPTH_16S; ///< signed 16-bit integers
+const int ISL_STORAGE_CHAR      = IPL_DEPTH_8S;  ///<   signed  8-bit integers
+const int ISL_STORAGE_UCHAR     = IPL_DEPTH_8U;  ///< unsigned  8-bit integers
+const int ISL_STORAGE_SHORT     = IPL_DEPTH_16S; ///<   signed 16-bit integers
 const int ISL_STORAGE_USHORT    = IPL_DEPTH_16U; ///< unsigned 16-bit integers
-const int ISL_STORAGE_LONG      = IPL_DEPTH_32S; ///< signed 32-bit integers
+const int ISL_STORAGE_LONG      = IPL_DEPTH_32S; ///<   signed 32-bit integers
+const int ISL_STORAGE_ULONG     = IPL_DEPTH_32S; ///< unsigned 32-bit integers
 const int ISL_STORAGE_FLOAT     = IPL_DEPTH_32F; ///< single precision floating-point numbers
 const int ISL_STORAGE_DOUBLE    = IPL_DEPTH_64F; ///< double precision floating-point numbers
 /** @} */
@@ -230,13 +231,13 @@ const int ISL_INTERP_AREA       = CV_INTER_AREA; ///< area mapping algorithm (be
  *  @{
  */
 const int ISL_ROTATE_NONE_FLIP_NONE = 0; ///< no transformation
-const int ISL_ROTATE_90_FLIP_NONE   = 1; ///< 90° rotation
-const int ISL_ROTATE_180_FLIP_NONE  = 2; ///< 180° rotation
-const int ISL_ROTATE_270_FLIP_NONE  = 3; ///< 270° rotation
+const int ISL_ROTATE_90_FLIP_NONE   = 1; ///< 90ï¿½ rotation
+const int ISL_ROTATE_180_FLIP_NONE  = 2; ///< 180ï¿½ rotation
+const int ISL_ROTATE_270_FLIP_NONE  = 3; ///< 270ï¿½ rotation
 const int ISL_ROTATE_NONE_FLIP_H    = 4; ///< horizontal flip
-const int ISL_ROTATE_90_FLIP_H      = 5; ///< 90° rotation, then horizontal flip
-const int ISL_ROTATE_180_FLIP_H     = 6; ///< 180° rotation, then horizontal flip
-const int ISL_ROTATE_270_FLIP_H     = 7; ///< 270° rotation, then horizontal flip
+const int ISL_ROTATE_90_FLIP_H      = 5; ///< 90ï¿½ rotation, then horizontal flip
+const int ISL_ROTATE_180_FLIP_H     = 6; ///< 180ï¿½ rotation, then horizontal flip
+const int ISL_ROTATE_270_FLIP_H     = 7; ///< 270ï¿½ rotation, then horizontal flip
 /** @} */
 
 

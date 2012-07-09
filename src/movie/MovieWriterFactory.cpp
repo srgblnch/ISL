@@ -4,6 +4,7 @@
 #include "MovieWriter_GraphicFileISL.h"
 #include "MovieWriter_GraphicFileRAS.h"
 #include "MovieWriter_GraphicFileASCII.h"
+#include "MovieWriter_Nexus.h"
 #include <algorithm>
 
 namespace isl
@@ -42,6 +43,12 @@ namespace isl
          || (config.format == "pgm"))
     {
       ISL_CALL( mvw = new MovieWriter_GraphicFileISL(config) );
+    }
+
+    if ((config.format == "nxs")
+     || (config.format == "xml"))
+    {
+      ISL_CALL( mvw = new MovieWriter_Nexus(config) );
     }
 
     /*

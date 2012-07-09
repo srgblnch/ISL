@@ -1,5 +1,7 @@
 
-OPENCV_ROOT ?= $(SOLEIL_ROOT)/sw-support/OpenCV
+OPENCV_ROOT ?= /siciliarep/build/opencv
+NEXUS_ROOT ?= $(SICILIA)
+SOLEIL_ROOT ?= .
 
 RELEASE_TYPE=OPTIMIZED
 
@@ -13,6 +15,20 @@ RELEASE_TYPE=OPTIMIZED
 #                of a library with no Tango dependencies)
 #
 PROJECT_TYPE = STATIC_LIB
+
+#=============================================================================
+# OUTPUT_DIR - this directory will contain the build result
+#=============================================================================
+# - STATIC_LIB : defaults to ../lib
+# - SHARED_LIB : defaults to ../lib
+# - DEVICE     : defaults to $(HOME)/DeviceServers
+# - SIMPLE_EXE : defaults to ../bin
+#-----------------------------------------------------------------------------
+ifeq ($(PROJECT_TYPE),STATIC_LIB)
+  OUTPUT_DIR = ../lib/static/`getos`
+else
+  OUTPUT_DIR = ../lib/shared/`getos`
+endif
 
 
 #=============================================================================
@@ -32,7 +48,7 @@ endif
 #   - for a device server, tango dependencies are automatically appended
 #   - '-I ../include' and '-I .' are automatically appended in all cases
 #
-INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv
+INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv -I $(NEXUS_ROOT)/include 
 
 
 #=============================================================================
@@ -43,7 +59,7 @@ INC_DIR_USER=	-I $(OPENCV_ROOT)/include/opencv
 ifeq ($(PROJECT_TYPE),STATIC_LIB)
 	LIB_DIR_USER=
 else
-	LIB_DIR_USER=-L$(OPENCV_ROOT)/lib
+	LIB_DIR_USER=-L$(OPENCV_ROOT)/lib -L$(NEXUS_ROOT)/lib 
 endif
 
 
@@ -62,7 +78,7 @@ endif
 ifeq ($(PROJECT_TYPE),STATIC_LIB)
 	LFLAGS_USR=
 else
-	LFLAGS_USR=-lcv -lcxcore -lhighgui
+	LFLAGS_USR=-lcv -lcxcore -lhighgui -lNeXus 
 endif
 
 
@@ -116,7 +132,8 @@ SVC_OBJS = $(OBJDIR)/Image.o \
            $(OBJDIR)/movie/MovieWriter.o \
            $(OBJDIR)/movie/MovieWriter_GraphicFile.o \
            $(OBJDIR)/movie/MovieWriter_GraphicFileASCII.o \
-           $(OBJDIR)/movie/MovieWriter_GraphicFileISL.o
+           $(OBJDIR)/movie/MovieWriter_GraphicFileISL.o \
+	   $(OBJDIR)/movie/MovieWriter_Nexus.o
 
 #
 # Verbose mode
@@ -145,11 +162,16 @@ release-static:
 	$(MAKEIT) RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=STATIC_LIB
 
 
-releases:
-	$(MAKEIT) RELEASE_TYPE=DEBUG PROJECT_TYPE=SHARED_LIB clean all
-	$(MAKEIT) RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=SHARED_LIB clean all
-	$(MAKEIT) RELEASE_TYPE=DEBUG PROJECT_TYPE=STATIC_LIB clean all
+optimized:
 	$(MAKEIT) RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=STATIC_LIB clean all
+	$(MAKEIT) RELEASE_TYPE=OPTIMIZED PROJECT_TYPE=SHARED_LIB clean all
+
+debug:
+	$(MAKEIT) RELEASE_TYPE=DEBUG PROJECT_TYPE=STATIC_LIB clean all
+	$(MAKEIT) RELEASE_TYPE=DEBUG PROJECT_TYPE=SHARED_LIB clean all
+
+releases: optimized debug
+
 
 distrib: releases
 	cd ../include/isl; cp *.h *.i $(SOLEIL_ROOT)/sw-support/ISL/include/isl
@@ -158,4 +180,4 @@ distrib: releases
 	cd ../include/isl/geometry; cp *.h *.i *.t $(SOLEIL_ROOT)/sw-support/ISL/include/isl/geometry
 	cd ../include/isl/movie; cp *.h $(SOLEIL_ROOT)/sw-support/ISL/include/isl/movie
 	cd ../include/isl/statistics; cp *.h *.i $(SOLEIL_ROOT)/sw-support/ISL/include/isl/statistics
-	cd ../lib; cp *.a $(SOLEIL_ROOT)/sw-support/ISL/lib/static; cp *.so $(SOLEIL_ROOT)/sw-support/ISL/lib/shared
+	cd ../lib; cp static/*.a $(SOLEIL_ROOT)/sw-support/ISL/lib/static; cp shared/*.so $(SOLEIL_ROOT)/sw-support/ISL/lib/shared
