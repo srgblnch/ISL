@@ -42,6 +42,9 @@
                            <includePath>${basedir}/include</includePath>
                            <includePath>${basedir}/src</includePath>
                        </includePaths>
+					   <excludes>
+                            <exclude>**/movie/MovieWriter_Nexus.cpp</exclude>
+                        </excludes>
                    </cpp>
                </configuration>
            </plugin>
