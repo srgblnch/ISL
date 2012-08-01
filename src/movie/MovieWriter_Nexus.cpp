@@ -31,11 +31,14 @@
             DBGOUT << " MEC" << std::endl; \
             throw_isl(0, __FUNCTION__, "Nexus problems running "#fn); \
         } \
-        DBGOUT << " OK" << std::endl; \
+        std::cout << " OK" << std::endl; \
     } else (void)0
 
 #define NXdo(fn, ...) NXdo_fd(fn, this->m_nexusHandle, ## __VA_ARGS__)
 
+#define DEPTH 0
+#define HEIGHT 1
+#define WIDTH 2
 
 namespace isl
 {
@@ -72,18 +75,19 @@ void MovieWriter_Nexus::write_head(int width, int height)
 {
     m_headWritten = true;
 
-    DBGOUT << "MovieWriter_Nexus::write_head()" << std::endl;
+    //DBGOUT << "MovieWriter_Nexus::write_head()" << std::endl;
     std::stringstream fname;
     fname << config.file_basename << "." << config.format;
+    DBGOUT << "MovieWriter_Nexus::write_head() filename: " << fname.str().c_str() << std::endl;
 
     if (config.format == "xml")
         NXdo_fd(open, fname.str().c_str(), NXACC_CREATEXML, &this->m_nexusHandle);
     else
         NXdo_fd(open, fname.str().c_str(), NXACC_CREATE5, &this->m_nexusHandle);
 
-    m_shape[0] = NX_UNLIMITED;
-    m_shape[2] = width;
-    m_shape[1] = height;
+    m_shape[DEPTH] = NX_UNLIMITED;
+    m_shape[WIDTH] = width;
+    m_shape[HEIGHT] = height;
 
     int shape;
     NXlink data_id;
@@ -91,7 +95,7 @@ void MovieWriter_Nexus::write_head(int width, int height)
     /// @todo
     NXdo(putattr, "user_name", (void*)("isl"), 3, NX_CHAR);
 
-    std::string entry_name = "entry1";
+    std::string entry_name = "entry1";// @todo if file exist add new entries
     NXdo(makegroup, entry_name.c_str(), "NXentry");
     NXdo(opengroup, entry_name.c_str(), "NXentry");
 
@@ -105,8 +109,8 @@ void MovieWriter_Nexus::write_head(int width, int height)
                 NXdo(putdata, (void*)start_time.c_str());
             NXdo(closedata);
 
-            NXdo(makegroup, "basler", "NXdetector");
-            NXdo(opengroup, "basler", "NXdetector");
+            NXdo(makegroup, "basler", "NXdetector"); // @todo this must include
+            NXdo(opengroup, "basler", "NXdetector"); // the ccd model
                 std::stringstream ss;
                 ss << this->config.bit_depth;
                 std::string bit_depth = ss.str();
@@ -135,7 +139,7 @@ void MovieWriter_Nexus::write_head(int width, int height)
 void MovieWriter_Nexus::write_frame( const isl::Image& frame )
 {
 
-    DBGOUT << "MovieWriter_Nexus::write_frame()" << std::endl;
+    DBGOUT << "MovieWriter_Nexus::write_frame() #" << this->m_frameCount << std::endl;
     /// Why not just calling write_head() on the constructor?
     /// apparently NeXus ignores the data that is appended from
     /// a thread different to were NXopen was done.
@@ -165,7 +169,7 @@ void MovieWriter_Nexus::write_frame( const isl::Image& frame )
     size[2] = frame.width();
     size[1] = frame.height();
 
-    if ( (size[1] != m_shape[1]) != (size[2] != m_shape[2]) ) {
+    if ( (size[1] != m_shape[HEIGHT]) != (size[2] != m_shape[WIDTH]) ) {
       throw_isl( 0,
                  "MovieWriter_Nexus::write_frame",
                  "Image size should not change while saving video.");

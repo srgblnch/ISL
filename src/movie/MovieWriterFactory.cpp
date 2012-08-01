@@ -1,10 +1,10 @@
 #include <isl/movie/MovieWriter.h>
 #include "InternalErrorHandler.h"
-#include "MovieWriter_FFmpeg.h"
+//#include "MovieWriter_FFmpeg.h"
 #include "MovieWriter_GraphicFileISL.h"
-#include "MovieWriter_GraphicFileRAS.h"
-#include "MovieWriter_GraphicFileASCII.h"
 #include "MovieWriter_Nexus.h"
+//#include "MovieWriter_GraphicFileRAS.h"
+#include "MovieWriter_GraphicFileASCII.h"
 #include <algorithm>
 
 namespace isl
@@ -27,13 +27,11 @@ namespace isl
     config.frame_rate    = _config.frame_rate;
 
 
-    /*
-    if (config.format == "mpg"
+    /*if (config.format == "mpg"
         || config.format == "avi")
     {
       mvw = new MovieWriter_FFmpeg(config);
-    }
-    */
+    }*/
 
     if ((config.format == "jpg")
          || (config.format == "png")
@@ -63,10 +61,10 @@ namespace isl
       ISL_CALL( mvw = new MovieWriter_GraphicFileASCII(config) );
     }
     
-    if (config.format == "mat")
+    /*if (config.format == "mat")
     {
 
-    }
+    }*/
 
     __END__;
     __ISL_CHECK_ERROR__;

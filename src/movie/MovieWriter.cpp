@@ -4,6 +4,7 @@
 #include "MovieWriter_GraphicFileISL.h"
 #include "MovieWriter_GraphicFileRAS.h"
 #include "MovieWriter_GraphicFileASCII.h"
+#include "MovieWriter_Nexus.h"
 #include <algorithm>
 
 namespace isl
