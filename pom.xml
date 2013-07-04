@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <parent>
@@ -13,9 +13,9 @@
    <name>ISL</name>
    <description>ISL library</description>
    <scm>
-       <connection>${scm.connection.cvs.tango-ds}:Libraries/ISL</connection>
-       <developerConnection>${scm.developerConnection.cvs.tango-ds}:Libraries/ISL</developerConnection>
-       <url>${scm.url.cvs.tango-ds}/Libraries/ISL</url>
+       <connection>${scm.connection.svn.tango-ds}/Libraries/ISL/trunk/</connection>
+       <developerConnection>${scm.connection.svn.tango-ds}/Libraries/ISL/trunk/</developerConnection>
+       <url>${scm.connection.svn.tango-ds}/Libraries/ISL/trunk/</url>
    </scm>
    <developers>
     <developer>
