@@ -738,4 +738,20 @@ Image::unserialize(const void* input)
   return *this;
 }
 
+
+
+
+void 
+Image::resize(Image& dest_image) const
+{
+CV_FUNCNAME( "Image::resize" );
+  __BEGIN__;
+
+  CV_CALL( cvResize(this->cv_image_, dest_image.cv_image_) );
+
+  __END__;
+  __ISL_CHECK_ERROR__;
+
+}
+
 }

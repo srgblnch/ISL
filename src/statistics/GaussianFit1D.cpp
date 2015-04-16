@@ -9,6 +9,7 @@
 #include "InternalErrorHandler.h"
 #include <isl/Constants.h>
 #include <isl/statistics/Moments.h>
+#include <fstream>
 
 #if !defined (__ISL_INLINE__)
 # include <isl/statistics/GaussianFit1D.i>
@@ -18,8 +19,9 @@ namespace isl {
 
 
 GaussianFit1D::GaussianFit1D()
-: x_(0),
-  fixed_bg(false)
+: x_(0), fixed_bg(false)
+  // fixed_bg(false),
+  // super_gaussian_fit_enable(false)
 {
 }
 
@@ -34,8 +36,28 @@ GaussianFit1D::compute(const double* vector,
                        size_t vector_size,
                        double magnitude,
                        double mean,
-                       double covariance,
+                       double sigma,
                        double background)
+{
+#ifdef _IBA_ENABLE_SUPER_GAUSSIAN_FLAG_
+	if (super_gaussian_fit_enable)
+	{
+		this->computeSuperGaussianFit(vector, vector_size, magnitude, mean, sigma, background);
+	}
+	else
+#endif	
+	{
+		this->computeGaussianFit(vector, vector_size, magnitude, mean, sigma*sigma, background);
+	}
+}
+
+void
+GaussianFit1D::computeGaussianFit(const double* vector,
+								   size_t vector_size,
+								   double magnitude,
+								   double mean,
+								   double covariance,
+								   double background)
 {
   CvMat* init_guess = 0;
   CvMat* x = 0;
@@ -50,6 +72,7 @@ GaussianFit1D::compute(const double* vector,
   if (magnitude <= DBL_EPSILON || covariance <= DBL_EPSILON)
   {
     //- the data cannot be fitted
+	LMOptim::nb_iter(LMOptim::nb_iter()); // max == nb iter (not converged)
     CV_ERROR( CV_StsBadArg, "Data cannot be fitted");
   }
 
@@ -89,20 +112,43 @@ GaussianFit1D::compute(const double* vector,
   __ISL_CHECK_ERROR__;
 }
 
+void
+GaussianFit1D::computeSuperGaussianFit(const double* vector,
+									  size_t vector_size,
+									  double magnitude,
+									  double mean,
+									  double sigma,
+									  double background)
+{
+#ifdef _IBA_ENABLE_SUPER_GAUSSIAN_FLAG_  
+	super_Gaussian_Fitter.setGuessParams(magnitude, 2*sigma, 2, mean);
+	super_Gaussian_Fitter.apply(vector_size, vector);
+	double fwhm = super_Gaussian_Fitter.getFWHM();
+	double v1_e2 = super_Gaussian_Fitter.get1_e2();
+#endif	
+
+}
 
 void
 GaussianFit1D::compute(const double* vector,
                        size_t vector_size)
 {
-  double magnitude, mean, covariance, background;
+  double magnitude, mean, sigma, background;
 
 
   CV_FUNCNAME( "GaussianFit1D::compute" );
   __BEGIN__;
 
-  this->initial_guess(vector, vector_size, magnitude, mean, covariance, background);
+  this->initial_guess(vector, vector_size, magnitude, mean, sigma, background);
 
-  ISL_CALL( this->compute(vector, vector_size, magnitude, mean, covariance, background) );
+	/*std::ofstream ofs("D:\\cameraGaussianGuess.txt");
+
+    ofs << "vector_size = " << vector_size << std::endl;
+    ofs << "magnitude = " << magnitude << std::endl << "mean = " << mean << std::endl << "sigma = " << sigma << std::endl;
+
+    ofs.close();*/
+
+  ISL_CALL( this->compute(vector, vector_size, magnitude, mean, sigma, background) );
 
   __END__;
   __ISL_CHECK_ERROR__;
@@ -115,7 +161,7 @@ GaussianFit1D::compute_fixed_bg(const double* vector,
                                 size_t vector_size,
                                 double _fixed_bg_value)
 {
-  double magnitude, mean, covariance;
+  double magnitude, mean, sigma;
 
 
   CV_FUNCNAME( "GaussianFit1D::compute" );
@@ -124,9 +170,9 @@ GaussianFit1D::compute_fixed_bg(const double* vector,
   this->fixed_bg = true;
   this->fixed_bg_value = _fixed_bg_value;
 
-  this->initial_guess(vector, vector_size, magnitude, mean, covariance, _fixed_bg_value);
+  this->initial_guess(vector, vector_size, magnitude, mean, sigma, _fixed_bg_value);
 
-  ISL_CALL( this->compute(vector, vector_size, magnitude, mean, covariance, _fixed_bg_value) );
+  ISL_CALL( this->compute(vector, vector_size, magnitude, mean, sigma, _fixed_bg_value) );
 
   __END__;
   __ISL_CHECK_ERROR__;
@@ -137,22 +183,44 @@ GaussianFit1D::compute_fixed_bg(const double* vector,
 double
 GaussianFit1D::get_fitted_value(int idx)
 {
-	double xc = static_cast<double>(idx) - this->mean();
-	double value = this->magnitude() * ::exp( - 0.5 * xc * xc / this->variance() ) + this->background(); 
+	double value = 0;
+	
+#ifdef _IBA_ENALE_SUPER_GAUSSIAN_FLAG_
+	if (super_gaussian_fit_enable)
+	{
+		value = super_Gaussian_Fitter.getFittedData()[idx];
+	}
+	else
+#endif	
+	{
+		double xc = static_cast<double>(idx) - this->mean();
+		value = this->magnitude() * ::exp( - 0.5 * xc * xc / this->variance() ) + this->background(); 
+	}
 	return(value);
 }
 
 double
 GaussianFit1D::get_fitted_error(int idx)
 {
-	return cvmGet(&this->observ_, idx, 0) - this->get_fitted_value(idx);
+	double value = 0;
+#ifdef _IBA_ENALE_SUPER_GAUSSIAN_FLAG_
+	if (super_gaussian_fit_enable)
+	{
+		value = super_Gaussian_Fitter.getResidualData()[idx];
+	}
+	else
+#endif	
+	{
+		 value = cvmGet(&this->observ_, idx, 0) - this->get_fitted_value(idx);
+	}
+	return(value);
 }
 
 void GaussianFit1D::initial_guess(const double* vector,
                                   size_t vector_size,
                                   double& magnitude,
                                   double& mean,
-                                  double& covariance,
+                                  double& sigma,
                                   double& background)
 {
 
@@ -160,7 +228,7 @@ void GaussianFit1D::initial_guess(const double* vector,
   {
     magnitude = vector[0];
     mean = 0;
-    covariance = 1;
+    sigma = 1;
     background = 0;
     return;
   }
@@ -217,7 +285,6 @@ void GaussianFit1D::initial_guess(const double* vector,
   //-----------------------
   //- SIGMA
   //----------------------- 
-  double sigma;
   {
     double val = vector[maxima_pos];
     size_t pos = maxima_pos;
@@ -252,8 +319,6 @@ void GaussianFit1D::initial_guess(const double* vector,
       //- try an arbitrary value that should be not so far from reality
       sigma = vector_size / 6;
     }
-
-    covariance = sigma * sigma;
   }
 
 
@@ -263,7 +328,7 @@ void GaussianFit1D::initial_guess(const double* vector,
   {
     //- compute the area under the curve
     //- by the trapezoidal method
-    double sum = 0;
+   /* double sum = 0;
   
     for (size_t i = 0; i < vector_size; i++)
     {
@@ -279,16 +344,16 @@ void GaussianFit1D::initial_guess(const double* vector,
     {
       //- the magnitude and the area are linked by : 
       //-    magnitude = A / sqrt(2 * pi * sigma²)
-      magnitude = sum / ::sqrt(2 * PI * covariance);
+      magnitude = sum / ::sqrt(2 * PI * sigma * sigma);
     }
     else
-    {
+    {*/
       //- estimated background too high
       //- poor chances of convergence
 
       //- try with the maximal value
       magnitude = vector[maxima_pos];
-    }
+    //}
   }
 }
 

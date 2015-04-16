@@ -27,7 +27,7 @@ LMOptim::LMOptim()
   esp_fwd_dif_(1.0E-8),
   max_iter_(100),
   nb_iter_(0),
-  eps_bd_(1.0E-6),
+  eps_bd_(1.0E-4),
   eps_(0),
   chi2_(0)
 {

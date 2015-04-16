@@ -11,10 +11,32 @@
 #include <isl/Image.h>
 #include <isl/statistics/Projections.h>
 #include <isl/statistics/GaussianFit1D.h>
-
+#include <limits>
 #if !defined (__ISL_INLINE__)
 # include <isl/statistics/GaussianFit2D.i>
 #endif
+
+/*
+//NRAMESURE
+#include <sys/timeb.h>
+#include <memory>
+#include <math.h>
+#include <fstream>
+
+long long __milliseconds_now() {
+    static LARGE_INTEGER s_frequency;
+    static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
+    if (s_use_qpc) {
+        LARGE_INTEGER now;
+        QueryPerformanceCounter(&now);
+        return (1000LL * now.QuadPart) / s_frequency.QuadPart;
+    } else {
+        return GetTickCount();
+    }
+}
+//NRAMESURE
+
+*/
 
 namespace isl {
 
@@ -141,14 +163,24 @@ GaussianFit2D::initial_guess(const Image& image,
   {
     Projections p(image);
     GaussianFit1D g;
-    
-    g.compute(p.get_x_projection(), p.size_x());
-    c_xx = g.variance();
-    
-    g.compute(p.get_y_projection(), p.size_y());
-    c_yy = g.variance();
+   
+	try
+	{
+		g.compute(p.get_x_projection(), p.size_x());
+		c_xx = g.variance();
+	    
+		g.compute(p.get_y_projection(), p.size_y());
+		c_yy = g.variance();
 
-    c_xy = 0;
+		c_xy = 0;
+	}
+	catch(...)
+	{
+		c_xx = 0.0;
+		c_yy = 0.0;
+		c_xy = 0.0;
+		LMOptim::nb_iter(LMOptim::nb_iter()); // max == nb iter (not converged)
+	}
   }
  
 
@@ -188,6 +220,7 @@ GaussianFit2D::compute(const Image& image,
   if (magnitude <= DBL_EPSILON || c_xx <= DBL_EPSILON || c_yy <= DBL_EPSILON)
   {
     //- the data cannot be fitted
+	LMOptim::nb_iter(LMOptim::nb_iter()); // max == nb iter (not converged)
     CV_ERROR( CV_StsBadArg, "Data cannot be fitted");
   }
   
@@ -260,24 +293,25 @@ GaussianFit2D::compute(const Image& image,
 void
 GaussianFit2D::compute(const Image& image)
 {
-  double magnitude, mean_x, mean_y, c_xx, c_xy, c_yy, background;
+  double magnitude = std::numeric_limits<double>::quiet_NaN();
+  double mean_x = std::numeric_limits<double>::quiet_NaN();
+  double mean_y = std::numeric_limits<double>::quiet_NaN();
+  double c_xx = std::numeric_limits<double>::quiet_NaN();
+  double c_xy = std::numeric_limits<double>::quiet_NaN();
+  double c_yy = std::numeric_limits<double>::quiet_NaN();
+  double background = std::numeric_limits<double>::quiet_NaN();
 
   CV_FUNCNAME( "GaussianFit2D::compute" );
   __BEGIN__;
-  
-  ISL_CALL( this->initial_guess(image, magnitude, mean_x, mean_y, c_xx, c_xy, c_yy, background) );
+ 
 
-  ISL_CALL( this->compute(image, magnitude, mean_x, mean_y, c_xx, c_xy, c_yy, background) );
+	ISL_CALL( this->initial_guess(image, magnitude, mean_x, mean_y, c_xx, c_xy, c_yy, background) );
+
+	ISL_CALL( this->compute(image, magnitude, mean_x, mean_y, c_xx, c_xy, c_yy, background) );
 
   __END__;
   __ISL_CHECK_ERROR__;
 }
-
-
-
-
-
-
 
 void
 GaussianFit2D::errfunc(CvMat* _params, CvMat* _err_func) const
