@@ -7,9 +7,15 @@
 //******************************************************************************
 #ifndef __INCLUDE_GAUSSIANFIT1D_H__
 #define __INCLUDE_GAUSSIANFIT1D_H__
+//////////////////// 
+//////////////////// 
+//#define _IBA_ENABLE_SUPER_GAUSSIAN_FLAG_
+//////////////////// 
+//////////////////// 
 
 #include <isl/ISLConfig.h>
 #include <isl/statistics/LMOptim.h>
+
 
 namespace isl {
 
@@ -33,6 +39,43 @@ namespace isl {
  */
 class ISL_DECL GaussianFit1D : public LMOptim
 {
+  private:
+
+	/**
+     *  \brief Main function for running the gaussian fit
+     *  \param[in] vector the buffer of values corresponding to the distribution
+     *  \param[in] vector_size the number of elements pointed to by \a vector
+     *  \param[in] magnitude the initial magnitude \f$ A \f$
+     *  \param[in] mean the initial mean \f$ x_0 \f$
+     *  \param[in] covariance the initial covariance \f$ \sigma^2 \f$
+     *  \param[in] background the initial background \f$ b \f$
+     *  \exception Exception
+     */
+    void
+      computeGaussianFit(const double* vector,
+              size_t vector_size,
+              double magnitude,
+              double mean,
+              double covariance,
+              double background);
+			  
+	/**
+     *  \brief Main function for running the super gaussian fit
+     *  \param[in] vector the buffer of values corresponding to the distribution
+     *  \param[in] vector_size the number of elements pointed to by \a vector
+     *  \param[in] magnitude the initial magnitude \f$ A \f$
+     *  \param[in] mean the initial mean \f$ x_0 \f$
+     *  \param[in] sigma the initial sigma \f$ \sigma \f$
+     *  \param[in] background the initial background \f$ b \f$
+     *  \exception Exception
+     */
+    void
+      computeSuperGaussianFit(const double* vector,
+              size_t vector_size,
+              double magnitude,
+              double mean,
+              double sigma,
+              double background);
   public:
     /**
      *  \brief Constructor
@@ -73,14 +116,49 @@ class ISL_DECL GaussianFit1D : public LMOptim
      */
     double
       background() const;
-
+	
     /**
-     *  \brief Main function for running the gaussian fit
+     *  \brief Accessor for the order \f$ order \f$
+     */
+    double
+      order() const;
+	  
+   /**
+     *  \brief Accessor for enable super gaussian fit
+     */
+    void
+      enableSuperGaussianFit(bool enable_value);
+
+	/**
+     *  \brief is super gaussian fit is enable
+     */
+    bool
+      isSuperGaussianFitEnable() const;
+	  
+	bool
+	  has_converged() const;
+
+	void
+	  nb_iter(int value);
+
+	int
+	  nb_iter() const;
+
+	void
+	  epsilon(double value);
+
+	double
+	  epsilon() const;
+
+	double
+	  chi2() const;
+    /**
+     *  \brief Main function for running the gaussian or super gaussian fit
      *  \param[in] vector the buffer of values corresponding to the distribution
      *  \param[in] vector_size the number of elements pointed to by \a vector
      *  \param[in] magnitude the initial magnitude \f$ A \f$
      *  \param[in] mean the initial mean \f$ x_0 \f$
-     *  \param[in] covariance the initial covariance \f$ \sigma^2 \f$
+     *  \param[in] sigma the initial sigma \f$ \sigma \f$
      *  \param[in] background the initial background \f$ b \f$
      *  \exception Exception
      */
@@ -89,7 +167,7 @@ class ISL_DECL GaussianFit1D : public LMOptim
               size_t vector_size,
               double magnitude,
               double mean,
-              double covariance,
+              double sigma,
               double background);
               
     /**
@@ -135,7 +213,11 @@ class ISL_DECL GaussianFit1D : public LMOptim
      */
     double
       get_fitted_error(int idx);
-
+	  
+#ifdef _IBA_ENABLE_SUPER_GAUSSIAN_FLAG_	  
+	Fitter_ns::SuperGaussianFit super_Gaussian_Fitter;
+#endif
+	
   protected:
     virtual void 
       errfunc(CvMat* params, CvMat* err_func) const;
@@ -154,7 +236,7 @@ class ISL_DECL GaussianFit1D : public LMOptim
                        size_t vector_size,
                        double& magnitude,
                        double& mean,
-                       double& covariance,
+                       double& sigma,
                        double& background);
 
     CvMat* x_;
@@ -162,6 +244,8 @@ class ISL_DECL GaussianFit1D : public LMOptim
 
     bool   fixed_bg;
     double fixed_bg_value;
+	bool   super_gaussian_fit_enable;	
+
 
 };
 /** @} */

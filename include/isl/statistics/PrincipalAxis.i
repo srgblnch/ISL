@@ -36,6 +36,20 @@ PrincipalAxis::get_angle() const
   return(angle_);
 }
 
+ISL_INLINE
+const Axis*
+PrincipalAxis::getMajor() const
+{
+  return major_;
+}
+
+ISL_INLINE
+const Axis*
+PrincipalAxis::getMinor() const
+{
+  return minor_;
+}
+
 
 
 }

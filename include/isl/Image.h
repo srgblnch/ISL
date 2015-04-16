@@ -390,6 +390,11 @@ class ISL_DECL Image
     void
       load(const char* filename);
 
+	/**
+	* Resize
+	*/
+	void resize(Image& dest_image) const;
+
   private:
     void
       create(int width, int height, int st);
