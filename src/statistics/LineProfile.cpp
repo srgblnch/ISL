@@ -138,12 +138,20 @@ LineProfile::compute(const Image& image, Point2D<int> origin, Point2D<int> end, 
   dst_pt[1] = cvPoint2D32f( di + 1 - 0.5, -0.5 );
   dst_pt[2] = cvPoint2D32f( di + 1 - 0.5, t - 0.5 );
 
-  CV_CALL( map_matrix = cvCreateMat(2, 3, CV_32F) );
+#ifdef _IBA_USE_FLOAT64_ 
+    CV_CALL( map_matrix = cvCreateMat(2, 3, CV_64F) ); 
+#else 
+    CV_CALL( map_matrix = cvCreateMat(2, 3, CV_32F) ); 
+#endif 
 
   //- compute affine transform from DST to SRC (optimization in cvWarpAffine)
   CV_CALL( cvGetAffineTransform(dst_pt, src_pt, map_matrix) );
 
+#ifdef _IBA_USE_FLOAT64_ 
+  ISL_CALL( dst = new Image(di + 1, thickness, isl::ISL_STORAGE_DOUBLE) ); 
+#else 
   ISL_CALL( dst = new Image(di + 1, thickness, isl::ISL_STORAGE_FLOAT) );
+#endif
   
   CV_CALL( cvWarpAffine(src,
                         dst->get_ipl_image(),
